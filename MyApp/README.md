@@ -10,10 +10,21 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    npm install expo
    ```
-2. Start the app
+
+2. Install dependencies
+
+   ```bash
+   npm install expo
+   ```
+
+3. Start the app
 
    ```bash
    npm start -- --clear
+   ```
+4. if not started by above use this command
+
+   ```bash
    npx expo start
    ```
 
