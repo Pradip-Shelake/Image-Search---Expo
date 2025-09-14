@@ -1,98 +1,243 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useApp } from '@/context/AppContext';
+import { categories } from '@/data/drugs';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { user } = useApp();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const handleSearch = () => {
+    router.push('/search');
+  };
+
+  const handleCategoryPress = (category: any) => {
+    router.push({
+      pathname: '/drug-list',
+      params: { 
+        category: category.title,
+        drugs: JSON.stringify(category.drugs)
+      }
+    });
+  };
+
+  const handleUpload = () => {
+    router.push('/search');
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <View style={styles.logoContainer}>
+              <View style={styles.logo}>
+                <View style={styles.logoBar1} />
+                <View style={styles.logoBar2} />
+                <View style={styles.logoBar3} />
+              </View>
+            </View>
+            <View>
+              <Text style={styles.greeting}>Good Morning!</Text>
+              <Text style={styles.userName}>{user.name}</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.avatar}>
+            <Image 
+              source={{ uri: user.avatar }} 
+              style={styles.avatarImage}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.searchContainer} onPress={handleSearch}>
+          <Ionicons name="search" size={20} color="#666" />
+          <Text style={styles.searchPlaceholder}>Search by Drug name</Text>
+          <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
+            <Ionicons name="image" size={20} color="#666" />
+          </TouchableOpacity>
+        </TouchableOpacity>
+
+        <View style={styles.categoriesContainer}>
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[styles.categoryCard, { backgroundColor: category.color }]}
+              onPress={() => handleCategoryPress(category)}
+            >
+              <View style={styles.categoryContent}>
+                <View style={styles.categoryText}>
+                  <Text style={styles.categoryTitle}>{category.title}</Text>
+                  <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
+                </View>
+                <View style={styles.categoryIcon}>
+                  <Text style={styles.categoryEmoji}>{category.icon}</Text>
+                  <View style={styles.pillsContainer}>
+                    <View style={styles.pill1} />
+                    <View style={styles.pill2} />
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 30,
+  },
+  headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
+  logoContainer: {
+    marginRight: 12,
+  },
+  logo: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: '#e3f2fd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  logoBar1: {
+    width: 4,
+    height: 20,
+    backgroundColor: '#2196F3',
+    marginRight: 2,
+  },
+  logoBar2: {
+    width: 4,
+    height: 24,
+    backgroundColor: '#1976D2',
+    marginRight: 2,
+  },
+  logoBar3: {
+    width: 4,
+    height: 16,
+    backgroundColor: '#64B5F6',
+  },
+  greeting: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  searchPlaceholder: {
+    flex: 1,
+    marginLeft: 12,
+    color: '#666',
+    fontSize: 16,
+  },
+  uploadButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#f8f9fa',
+  },
+  categoriesContainer: {
+    gap: 16,
+    paddingBottom: 120,
+  },
+  categoryCard: {
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  categoryContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  categoryText: {
+    flex: 1,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  categorySubtitle: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  categoryIcon: {
+    alignItems: 'center',
+    position: 'relative',
+  },
+  categoryEmoji: {
+    fontSize: 40,
+    marginBottom: 8,
+  },
+  pillsContainer: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  pill1: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFB74D',
+  },
+  pill2: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#81C784',
+    marginTop: 2,
   },
 });
